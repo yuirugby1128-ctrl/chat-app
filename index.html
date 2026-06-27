@@ -488,7 +488,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
 <div class="modal-overlay" id="dm-modal">
   <div class="modal">
     <div class="modal-title">DM を送る</div>
-    <div class="modal-field"><label>相手のメールアドレス</label><input type="text" id="dm-user-input" placeholder="friend@example.com"></div>
+    <div class="modal-field"><label>相手の表示名</label><input type="text" id="dm-user-input" placeholder="名前を入力"></div>
     <div class="join-err" id="dm-err"></div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal('dm-modal')">キャンセル</button>
@@ -1115,14 +1115,14 @@ window.openAddDM = function() {
   setTimeout(() => document.getElementById('dm-user-input').focus(), 80);
 };
 window.addDM = async function() {
-  const email = document.getElementById('dm-user-input').value.trim().toLowerCase();
-  if(!email) { document.getElementById('dm-err').textContent = 'メールアドレスを入力してください'; return; }
-  if(email === currentUser.email) { document.getElementById('dm-err').textContent = '自分にDMは送れません'; return; }
-  // find user by email
-  const q = query(collection(db, 'users'), where('email', '==', email), limit(1));
+  const name = document.getElementById('dm-user-input').value.trim();
+  if(!name) { document.getElementById('dm-err').textContent = '名前を入力してください'; return; }
+  // find user by name
+  const q = query(collection(db, 'users'), where('name', '==', name), limit(1));
   const snap = await getDocs(q);
   if(snap.empty) { document.getElementById('dm-err').textContent = 'このユーザーは見つかりません'; return; }
   const targetUid = snap.docs[0].id;
+  if(targetUid === currentUser.uid) { document.getElementById('dm-err').textContent = '自分にDMは送れません'; return; }
   const members = [currentUser.uid, targetUid].sort();
   const dmId = 'dm_' + members.join('_');
   const dmRef = doc(db, 'dms', dmId);
