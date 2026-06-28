@@ -10,6 +10,11 @@
 <meta property="og:type" content="website">
 <link rel="canonical" href="https://chat-app-acount.github.io/chat-app/">
 <meta name="google-site-verification" content="mnPUk6etEpDQUZH1vDYiRF1-0qEYr3Ox3F3NEcMzGqg" />
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#7c6af7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ChatSpace">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 html[data-theme="dark"]{
@@ -1292,6 +1297,14 @@ mi.addEventListener('keydown', function(e) { if(e.key === 'Enter' && !e.shiftKey
   if(el) el.addEventListener('keydown', e => { if(e.key === 'Enter') window.doEmailAuth(); });
 });
 document.getElementById('join-room-id').addEventListener('keydown', e => { if(e.key === 'Enter') window.joinRoom(); });
+
+// Service Worker登録
+if('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/chat-app/sw.js').then(reg => {
+    console.log('SW registered');
+  }).catch(err => console.log('SW error:', err));
+}
+
 </script>
 </body>
 </html>
