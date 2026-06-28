@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>チャットアプリ－Web上のみで友達と会話ができるチャットアプリ！みんなでチャットを楽しもう♪</title>
+<title>チャットアプリ-webで友達と会話ができるチャットアプリ！みんなでチャットを楽しもう♪</title>
 <meta name="description" content="Web上のみで友達と会話ができるチャットアプリ！みんなでチャットを楽しもう♪ グループチャット、ダイレクトメッセージ、Googleログイン対応。無料で今すぐ使える。">
 <meta property="og:title" content="ChatSpace">
 <meta property="og:description" content="友達やチームとリアルタイムでチャットできる無料のチャットアプリ">
@@ -279,6 +279,29 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
 .loading-spin{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* online status */
+.online-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.offline-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0;}
+.member-dot.offline{background:var(--muted);}
+
+/* pinned message */
+.pinned-bar{display:flex;align-items:center;gap:8px;padding:6px 22px;background:var(--accent-glow);border-bottom:1px solid var(--border);font-size:12px;color:var(--accent2);cursor:pointer;}
+.pinned-bar:hover{background:var(--surface2);}
+.pinned-bar-text{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pinned-icon{flex-shrink:0;color:var(--accent);}
+.msg-pinned{border-left:3px solid var(--accent);padding-left:8px;}
+
+/* edit */
+.msg-edited{font-size:10px;color:var(--muted);margin-left:4px;}
+.edit-input{width:100%;background:var(--bg);border:1.5px solid var(--accent);border-radius:8px;color:var(--text);font-size:13.5px;font-family:'Inter',sans-serif;padding:6px 10px;outline:none;resize:none;}
+
+/* room customize modal */
+.room-color-swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.room-color-swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:transform .15s,border-color .15s;}
+.room-color-swatch:hover{transform:scale(1.18);}
+.room-color-swatch.selected{border-color:var(--text);}
+.room-icon-input{font-size:22px;text-align:center;width:52px;padding:6px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;color:var(--text);outline:none;}
+
 @media(max-width:720px){#sidebar{width:200px;min-width:200px;}#members-panel{display:none!important;}.auth-card{width:95vw;padding:26px 16px;}.account-inner{padding:18px 12px;}}
 </style>
 </head>
@@ -372,6 +395,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
             <div class="chat-header-desc" id="ch-desc"></div>
           </div>
           <div class="chat-header-actions">
+            <button class="icon-btn" onclick="openSearch()" title="検索">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </button>
+            <button class="icon-btn" onclick="createInviteLink()" title="招待リンク（24時間）">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+            </button>
             <button class="icon-btn" onclick="shareRoom()" title="リンクをコピー">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
             </button>
@@ -400,6 +429,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
       <div class="input-area">
         <div class="input-wrap">
           <textarea id="msg-input" rows="1" placeholder="メッセージを入力… (Enterで送信)"></textarea>
+          <button class="icon-btn" onclick="openStampPicker()" title="スタンプ" style="color:var(--muted);padding:4px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+          </button>
           <button class="send-btn" onclick="sendMessage()">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
@@ -449,6 +481,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
             <div class="theme-opt" id="theme-light-opt" onclick="setTheme('light')">
               <div class="theme-opt-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></div>
               <div class="theme-opt-label">ライト</div>
+            </div>
+            <div class="theme-opt" id="theme-auto-opt" onclick="setTheme('auto')">
+              <div class="theme-opt-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+              <div class="theme-opt-label">自動</div>
             </div>
           </div>
         </div>
@@ -565,17 +601,26 @@ let typingTimeout = null;
 let userCache = {};
 
 // ===== THEME =====
-function getTheme(){ return localStorage.getItem('cs_theme') || 'dark'; }
+function getTheme(){ return localStorage.getItem('cs_theme') || 'auto'; }
 function setTheme(t){
   localStorage.setItem('cs_theme', t);
-  document.documentElement.setAttribute('data-theme', t);
+  let actual = t;
+  if(t === 'auto') {
+    const h = new Date().getHours();
+    actual = (h >= 7 && h < 19) ? 'light' : 'dark';
+  }
+  document.documentElement.setAttribute('data-theme', actual);
   const d = document.getElementById('theme-dark-opt');
   const l = document.getElementById('theme-light-opt');
+  const a = document.getElementById('theme-auto-opt');
   if(d) d.classList.toggle('selected', t === 'dark');
   if(l) l.classList.toggle('selected', t === 'light');
+  if(a) a.classList.toggle('selected', t === 'auto');
 }
 window.setTheme = setTheme;
 setTheme(getTheme());
+// 自動モード: 1時間ごとに再チェック
+setInterval(() => { if(getTheme() === 'auto') setTheme('auto'); }, 3600000);
 
 // ===== AUTH =====
 window.switchTab = function(mode) {
@@ -692,9 +737,25 @@ function initApp() {
   updateMeUI();
   listenRooms();
   listenDMs();
+  setOnline();
   const params = new URLSearchParams(location.search);
   const sr = params.get('room');
   if(sr) openRoom(sr, 'room');
+  // 招待リンクチェック
+  const inv = params.get('invite');
+  if(inv) handleInviteLink(inv);
+}
+
+// ===== ONLINE STATUS =====
+async function setOnline() {
+  if(!currentUser) return;
+  await updateDoc(doc(db, 'users', currentUser.uid), { online: true, lastSeen: serverTimestamp() }).catch(()=>{});
+  window.addEventListener('beforeunload', () => {
+    updateDoc(doc(db, 'users', currentUser.uid), { online: false, lastSeen: serverTimestamp() }).catch(()=>{});
+  });
+  setInterval(() => {
+    if(currentUser) updateDoc(doc(db, 'users', currentUser.uid), { online: true, lastSeen: serverTimestamp() }).catch(()=>{});
+  }, 30000);
 }
 
 function updateMeUI() {
@@ -809,6 +870,7 @@ async function openRoom(id, type) {
     document.getElementById('member-list').innerHTML = '';
   }
   listenMessages(id, type);
+  listenTyping(id, type);
   document.getElementById('msg-input').focus();
   // notify permission
   if(Notification.permission === 'default') Notification.requestPermission();
@@ -922,6 +984,25 @@ function buildActions(msg, msgId, type, own) {
   reactBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>';
   reactBtn.onclick = (e) => { e.stopPropagation(); toggleEmojiPicker(reactBtn, msgId, type); };
   actions.appendChild(reactBtn);
+  // pin (room only)
+  if(type === 'room') {
+    const pinBtn = document.createElement('button'); pinBtn.className = 'msg-action-btn'; pinBtn.title = msg.pinned ? 'ピン解除' : 'ピン留め';
+    pinBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 00-1.11-1.79l-1.78-.9A2 2 0 0115 10.76V6h1a2 2 0 000-4H8a2 2 0 000 4h1v4.76a2 2 0 01-1.11 1.79l-1.78.9A2 2 0 005 15.24V17z"/></svg>';
+    pinBtn.onclick = () => togglePin(msgId, msg.text, msg.pinned);
+    actions.appendChild(pinBtn);
+  }
+  // edit / delete (own only)
+  if(own) {
+    const editBtn = document.createElement('button'); editBtn.className = 'msg-action-btn'; editBtn.title = '編集';
+    editBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    editBtn.onclick = () => startEdit(msgId, msg.text, type);
+    actions.appendChild(editBtn);
+    const delBtn = document.createElement('button'); delBtn.className = 'msg-action-btn'; delBtn.title = '削除';
+    delBtn.style.color = 'var(--red)';
+    delBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>';
+    delBtn.onclick = () => deleteMessage(msgId, type);
+    actions.appendChild(delBtn);
+  }
   return actions;
 }
 
@@ -1033,12 +1114,16 @@ async function listenMembers(roomId) {
   const members = snap.data().members || [];
   const list = document.getElementById('member-list'); list.innerHTML = '';
   for(const uid of members) {
-    const u = await getUser(uid);
+    const uSnap = await getDoc(doc(db, 'users', uid));
+    const u = uSnap.exists() ? uSnap.data() : { name: uid, color: COLORS[0], photoURL: null, online: false };
+    userCache[uid] = u;
     const div = document.createElement('div'); div.className = 'member-item';
     const av = document.createElement('div'); av.className = 'member-avatar';
     if(u.photoURL) { const img = document.createElement('img'); img.src = u.photoURL; av.appendChild(img); }
     else { av.style.background = u.color; av.textContent = u.name[0].toUpperCase(); }
-    const dot = document.createElement('div'); dot.className = 'member-dot'; av.appendChild(dot);
+    const dot = document.createElement('div');
+    dot.className = 'member-dot' + (u.online ? '' : ' offline');
+    av.appendChild(dot);
     const name = document.createElement('span'); name.className = 'member-name'; name.textContent = u.name;
     const isMe = uid === currentUser.uid;
     div.appendChild(av); div.appendChild(name);
@@ -1264,7 +1349,166 @@ window.deleteAccount = async function() {
   try { await deleteUser(currentUser); } catch(e) { showToast('再ログインが必要です', true); }
 };
 
-// ===== UTILS =====
+// ===== EDIT / DELETE / PIN =====
+async function startEdit(msgId, text, type) {
+  const bubbles = document.querySelectorAll('.msg-own-bubble, .msg-bubble');
+  bubbles.forEach(b => {
+    if(b.dataset.msgId === msgId) {
+      const inp = document.createElement('textarea');
+      inp.className = 'edit-input'; inp.value = text; inp.rows = 2;
+      inp.onkeydown = async (e) => {
+        if(e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          const newText = inp.value.trim(); if(!newText) return;
+          const ref = type === 'room' ? doc(db, 'rooms', currentRoom, 'messages', msgId) : doc(db, 'dms', currentRoom, 'messages', msgId);
+          await updateDoc(ref, { text: newText, edited: true });
+          showToast('メッセージを編集しました');
+        }
+        if(e.key === 'Escape') { b.textContent = text; }
+      };
+      b.replaceWith(inp); inp.focus();
+    }
+  });
+  // fallback: just update directly
+  const newText = prompt('メッセージを編集', text);
+  if(newText && newText.trim()) {
+    const ref = type === 'room' ? doc(db, 'rooms', currentRoom, 'messages', msgId) : doc(db, 'dms', currentRoom, 'messages', msgId);
+    await updateDoc(ref, { text: newText.trim(), edited: true });
+    showToast('メッセージを編集しました');
+  }
+}
+
+async function deleteMessage(msgId, type) {
+  if(!confirm('このメッセージを削除しますか？')) return;
+  const ref = type === 'room' ? doc(db, 'rooms', currentRoom, 'messages', msgId) : doc(db, 'dms', currentRoom, 'messages', msgId);
+  await updateDoc(ref, { text: '(削除済み)', deleted: true });
+  showToast('メッセージを削除しました');
+}
+
+async function togglePin(msgId, text, pinned) {
+  const ref = doc(db, 'rooms', currentRoom, 'messages', msgId);
+  const roomRef = doc(db, 'rooms', currentRoom);
+  if(pinned) {
+    await updateDoc(ref, { pinned: false });
+    await updateDoc(roomRef, { pinnedMsg: null, pinnedMsgId: null });
+    document.getElementById('pinned-bar').style.display = 'none';
+  } else {
+    await updateDoc(ref, { pinned: true });
+    await updateDoc(roomRef, { pinnedMsg: text, pinnedMsgId: msgId });
+    renderPinnedBar(text);
+  }
+  showToast(pinned ? 'ピン解除しました' : 'ピン留めしました');
+}
+
+function renderPinnedBar(text) {
+  let bar = document.getElementById('pinned-bar');
+  if(!bar) {
+    bar = document.createElement('div'); bar.id = 'pinned-bar'; bar.className = 'pinned-bar';
+    bar.innerHTML = '<svg class="pinned-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 00-1.11-1.79l-1.78-.9A2 2 0 0115 10.76V6h1a2 2 0 000-4H8a2 2 0 000 4h1v4.76a2 2 0 01-1.11 1.79l-1.78.9A2 2 0 005 15.24V17z"/></svg><span class="pinned-bar-text" id="pinned-bar-text"></span>';
+    const chatView = document.getElementById('chat-view');
+    const messages = document.getElementById('messages');
+    chatView.insertBefore(bar, messages);
+  }
+  document.getElementById('pinned-bar-text').textContent = text;
+  bar.style.display = 'flex';
+}
+
+// ===== TYPING DISPLAY =====
+let unsubTyping = null;
+function listenTyping(roomId, type) {
+  if(unsubTyping) unsubTyping();
+  const ref = doc(db, type === 'room' ? 'rooms' : 'dms', roomId);
+  unsubTyping = onSnapshot(ref, async snap => {
+    if(!snap.exists()) return;
+    const typing = snap.data().typing || {};
+    const now = Date.now();
+    const typers = [];
+    for(const [uid, ts] of Object.entries(typing)) {
+      if(uid === currentUser.uid) continue;
+      const msec = ts?.toMillis ? ts.toMillis() : 0;
+      if(now - msec < 3000) {
+        const u = await getUser(uid);
+        typers.push(u.name);
+      }
+    }
+    const ind = document.getElementById('typing-indicator');
+    if(typers.length > 0) {
+      ind.innerHTML = '<div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>' + escH(typers.join('、')) + ' が入力中...';
+    } else {
+      ind.innerHTML = '';
+    }
+  });
+}
+
+// ===== SEARCH =====
+window.openSearch = function() {
+  const q = prompt('メッセージを検索');
+  if(!q || !currentRoom) return;
+  searchMessages(q);
+};
+
+async function searchMessages(query) {
+  const type = currentRoomType;
+  const colPath = type === 'room' ? collection(db, 'rooms', currentRoom, 'messages') : collection(db, 'dms', currentRoom, 'messages');
+  const snap = await getDocs(query(colPath, orderBy('ts', 'asc')));
+  const results = snap.docs.filter(d => d.data().text?.toLowerCase().includes(query.toLowerCase()));
+  if(results.length === 0) { showToast('見つかりませんでした', true); return; }
+  showToast(results.length + '件見つかりました');
+}
+
+// ===== INVITE LINK =====
+window.createInviteLink = async function() {
+  if(!currentRoom || currentRoomType !== 'room') return;
+  const inviteId = 'inv_' + Math.random().toString(36).slice(2, 10);
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24時間
+  await setDoc(doc(db, 'invites', inviteId), {
+    roomId: currentRoom,
+    createdBy: currentUser.uid,
+    expiresAt: expires,
+    createdAt: serverTimestamp()
+  });
+  const url = location.origin + location.pathname + '?invite=' + inviteId;
+  navigator.clipboard.writeText(url).then(() => showToast('招待リンクをコピーしました（24時間有効）')).catch(() => prompt('招待リンク（24時間有効）:', url));
+};
+
+async function handleInviteLink(inviteId) {
+  const snap = await getDoc(doc(db, 'invites', inviteId));
+  if(!snap.exists()) { showToast('招待リンクが無効です', true); return; }
+  const inv = snap.data();
+  if(inv.expiresAt.toDate() < new Date()) { showToast('招待リンクの期限が切れています', true); return; }
+  const roomId = inv.roomId;
+  const roomSnap = await getDoc(doc(db, 'rooms', roomId));
+  if(!roomSnap.exists()) { showToast('ルームが見つかりません', true); return; }
+  const room = roomSnap.data();
+  if(!room.members.includes(currentUser.uid)) {
+    await updateDoc(doc(db, 'rooms', roomId), { members: arrayUnion(currentUser.uid) });
+    await addDoc(collection(db, 'rooms', roomId, 'messages'), {
+      type: 'system', text: userCache[currentUser.uid]?.name + 'が招待リンクで参加しました',
+      ts: serverTimestamp(), readBy: [], reactions: {}
+    });
+  }
+  openRoom(roomId, 'room');
+  showToast(room.name + 'に参加しました');
+}
+
+// ===== STAMPS =====
+const STAMPS = ['🎉','🎊','👏','🙌','💪','🤝','👋','✌️','🤞','💯','🔥','⭐','💫','🌟','❤️','💙','💚','💛','🧡','💜','😀','😂','🥹','😎','🤔','😴','🥳','🤩','😍','🥰'];
+window.openStampPicker = function() {
+  document.querySelectorAll('.stamp-picker').forEach(p => p.remove());
+  const picker = document.createElement('div');
+  picker.className = 'stamp-picker emoji-picker';
+  picker.style.cssText = 'position:fixed;bottom:80px;right:30px;width:240px;z-index:100;';
+  STAMPS.forEach(s => {
+    const b = document.createElement('button'); b.className = 'emoji-opt'; b.textContent = s;
+    b.onclick = () => {
+      const inp = document.getElementById('msg-input');
+      inp.value += s; inp.focus(); picker.remove();
+    };
+    picker.appendChild(b);
+  });
+  document.body.appendChild(picker);
+  setTimeout(() => document.addEventListener('click', () => picker.remove(), { once: true }), 0);
+};
 window.openModal = function(id) { document.getElementById(id).classList.add('show'); };
 window.closeModal = function(id) { document.getElementById(id).classList.remove('show'); };
 document.querySelectorAll('.modal-overlay').forEach(el => {
