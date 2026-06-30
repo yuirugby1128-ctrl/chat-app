@@ -319,6 +319,58 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
 .room-color-swatch.selected{border-color:var(--text);}
 
 @media(max-width:720px){#sidebar{width:200px;min-width:200px;}#members-panel{display:none!important;}.auth-card{width:95vw;padding:26px 16px;}.account-inner{padding:18px 12px;}}
+
+/* ===== URL PREVIEW ===== */
+.url-preview{margin-top:6px;border:1px solid var(--border);border-radius:10px;overflow:hidden;max-width:360px;cursor:pointer;transition:border-color .2s;}
+.url-preview:hover{border-color:var(--accent);}
+.url-preview-img{width:100%;height:140px;object-fit:cover;display:block;}
+.url-preview-body{padding:8px 10px;background:var(--surface2);}
+.url-preview-title{font-size:13px;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.url-preview-desc{font-size:11px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.url-preview-domain{font-size:10px;color:var(--accent2);margin-top:3px;}
+
+/* ===== PROFILE POPUP ===== */
+.profile-popup{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;width:220px;box-shadow:0 8px 30px var(--shadow);z-index:250;transition:opacity .15s;}
+.profile-popup-avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;margin-bottom:10px;overflow:hidden;}
+.profile-popup-avatar img{width:100%;height:100%;object-fit:cover;}
+.profile-popup-name{font-size:15px;font-weight:700;margin-bottom:2px;}
+.profile-popup-status{font-size:11px;display:flex;align-items:center;gap:4px;margin-bottom:10px;}
+.profile-popup-status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.profile-popup-dm{width:100%;padding:8px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background .2s;}
+.profile-popup-dm:hover{background:var(--accent2);}
+
+/* ===== BOOKMARK ===== */
+.msg-bookmarked .msg-bubble,.msg-bookmarked .msg-own-bubble{border-left:3px solid var(--yellow);padding-left:8px;}
+.bookmark-panel{width:240px;min-width:240px;background:var(--surface);border-left:1px solid var(--border);overflow-y:auto;display:none;flex-direction:column;}
+.bookmark-panel.show{display:flex;}
+.bookmark-header{padding:14px 14px 10px;font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.bookmark-item{padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;}
+.bookmark-item:hover{background:var(--surface2);}
+.bookmark-item-author{font-size:11px;color:var(--muted);margin-bottom:3px;}
+.bookmark-item-text{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bookmark-empty{padding:20px 14px;font-size:13px;color:var(--muted);text-align:center;}
+
+/* ===== SHORTCUT MODAL ===== */
+.shortcut-modal{width:400px;}
+.shortcut-list{display:flex;flex-direction:column;gap:8px;}
+.shortcut-item{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--surface2);border-radius:8px;}
+.shortcut-key{font-family:monospace;font-size:12px;background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:2px 8px;color:var(--accent2);}
+.shortcut-desc{font-size:13px;color:var(--text2);}
+
+/* ===== ROOM SEARCH MODAL ===== */
+.room-search-modal{width:440px;}
+.room-search-input{width:100%;padding:12px 14px;background:var(--bg);border:1.5px solid var(--accent);border-radius:10px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;outline:none;margin-bottom:12px;}
+.room-search-results{max-height:240px;overflow-y:auto;}
+.room-search-item{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;cursor:pointer;transition:background .12s;}
+.room-search-item:hover{background:var(--surface2);}
+.room-search-hash{color:var(--muted);font-size:14px;font-weight:700;}
+.room-search-name{font-size:14px;font-weight:500;}
+
+/* ===== UNREAD BADGE ===== */
+.room-badge{background:var(--accent);color:#fff;font-size:10px;font-weight:700;min-width:17px;height:17px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;flex-shrink:0;}
+
+/* ===== COPY BUTTON in msg actions ===== */
+.msg-copy-success{color:var(--green) !important;}
 </style>
 </head>
 <body>
@@ -420,8 +472,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
             <div class="chat-header-desc" id="ch-desc"></div>
           </div>
           <div class="chat-header-actions">
-            <button class="icon-btn" onclick="openSearch()" title="検索">
+            <button class="icon-btn" onclick="openSearch()" title="検索 (Ctrl+F)">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </button>
+            <button class="icon-btn" onclick="toggleBookmarks()" title="ブックマーク (Ctrl+B)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
             </button>
             <button class="icon-btn" onclick="shareRoom()" title="リンクをコピー">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
@@ -527,6 +582,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
     <div class="members-header">メンバー</div>
     <div id="member-list"></div>
   </div>
+
+  <div class="bookmark-panel" id="bookmark-panel">
+    <div class="bookmark-header">
+      ブックマーク
+      <button onclick="toggleBookmarks()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;">×</button>
+    </div>
+    <div id="bookmark-list"></div>
+  </div>
 </div>
 
 <!-- MODALS -->
@@ -567,6 +630,33 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
       <button class="btn-cancel" onclick="closeModal('join-modal')">キャンセル</button>
       <button class="btn-confirm" onclick="joinRoom()">参加する</button>
     </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="shortcut-modal">
+  <div class="modal shortcut-modal">
+    <div class="modal-title">ショートカットキー</div>
+    <div class="shortcut-list">
+      <div class="shortcut-item"><span class="shortcut-desc">ルーム検索</span><span class="shortcut-key">Ctrl + K</span></div>
+      <div class="shortcut-item"><span class="shortcut-desc">ブックマーク</span><span class="shortcut-key">Ctrl + B</span></div>
+      <div class="shortcut-item"><span class="shortcut-desc">メッセージ検索</span><span class="shortcut-key">Ctrl + F</span></div>
+      <div class="shortcut-item"><span class="shortcut-desc">ショートカット一覧</span><span class="shortcut-key">Ctrl + /</span></div>
+    </div>
+    <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('shortcut-modal')">閉じる</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="room-search-modal">
+  <div class="modal room-search-modal">
+    <div class="modal-title">ルームを検索</div>
+    <input class="room-search-input" id="room-search-input" placeholder="ルーム名を入力…" oninput="filterRooms(this.value)" autocomplete="off">
+    <div class="room-search-results" id="room-search-results"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="profile-popup-modal">
+  <div class="modal" style="width:240px;">
+    <div id="profile-popup-content"></div>
   </div>
 </div>
 
@@ -963,9 +1053,14 @@ function listenMessages(roomId, type) {
           ct.appendChild(rq);
         }
         const meta = document.createElement('div'); meta.className = own ? 'msg-own-meta' : 'msg-meta';
-        meta.innerHTML = '<span class="msg-author">' + escH(u.name) + '</span><span class="msg-time">' + fmtTime(msg.ts) + '</span>';
+        const authorSpan = document.createElement('span'); authorSpan.className = 'msg-author';
+        authorSpan.textContent = u.name; authorSpan.style.cursor = 'pointer';
+        authorSpan.onclick = (e) => window.showProfilePopup(msg.author, e);
+        const timeSpan = document.createElement('span'); timeSpan.className = 'msg-time'; timeSpan.textContent = fmtTime(msg.ts);
+        meta.appendChild(authorSpan); meta.appendChild(timeSpan);
         const bubble = document.createElement('div'); bubble.className = own ? 'msg-own-bubble' : 'msg-bubble';
-        bubble.textContent = msg.text;
+        bubble.textContent = msg.deleted ? '(削除済み)' : msg.text;
+        if(msg.edited && !msg.deleted) { const ed = document.createElement('span'); ed.className = 'msg-edited'; ed.textContent = '(編集済み)'; bubble.appendChild(ed); }
         ct.appendChild(meta); ct.appendChild(bubble);
         // reactions
         if(msg.reactions && Object.keys(msg.reactions).length > 0) {
@@ -1024,35 +1119,61 @@ function listenMessages(roomId, type) {
 
 function buildActions(msg, msgId, type, own) {
   const actions = document.createElement('div'); actions.className = 'msg-actions';
-  // reply
+
+  // コピー
+  const copyBtn = document.createElement('button'); copyBtn.className = 'msg-action-btn'; copyBtn.title = 'コピー';
+  copyBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+  copyBtn.onclick = () => {
+    navigator.clipboard.writeText(msg.text).then(() => {
+      copyBtn.classList.add('msg-copy-success');
+      setTimeout(() => copyBtn.classList.remove('msg-copy-success'), 1200);
+      showToast('コピーしました');
+    });
+  };
+  actions.appendChild(copyBtn);
+
+  // 返信
   const replyBtn = document.createElement('button'); replyBtn.className = 'msg-action-btn'; replyBtn.title = '返信';
   replyBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg>';
   replyBtn.onclick = () => setReply(msgId, msg.text);
   actions.appendChild(replyBtn);
-  // react
+
+  // リアクション
   const reactBtn = document.createElement('button'); reactBtn.className = 'msg-action-btn'; reactBtn.title = 'リアクション';
   reactBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>';
   reactBtn.onclick = (e) => { e.stopPropagation(); toggleEmojiPicker(reactBtn, msgId, type); };
   actions.appendChild(reactBtn);
-  // pin (room only)
+
+  // ブックマーク
+  const bmBtn = document.createElement('button'); bmBtn.className = 'msg-action-btn'; bmBtn.title = 'ブックマーク';
+  const isBookmarked = isMessageBookmarked(msgId);
+  bmBtn.style.color = isBookmarked ? 'var(--yellow)' : '';
+  bmBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="' + (isBookmarked ? 'var(--yellow)' : 'none') + '" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>';
+  bmBtn.onclick = () => toggleBookmark(msgId, msg.text, msg.author);
+  actions.appendChild(bmBtn);
+
+  // ピン（ルームのみ）
   if(type === 'room') {
     const pinBtn = document.createElement('button'); pinBtn.className = 'msg-action-btn'; pinBtn.title = msg.pinned ? 'ピン解除' : 'ピン留め';
     pinBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 00-1.11-1.79l-1.78-.9A2 2 0 0115 10.76V6h1a2 2 0 000-4H8a2 2 0 000 4h1v4.76a2 2 0 01-1.11 1.79l-1.78.9A2 2 0 005 15.24V17z"/></svg>';
     pinBtn.onclick = () => togglePin(msgId, msg.text, msg.pinned);
     actions.appendChild(pinBtn);
   }
-  // edit / delete (own only)
+
+  // 編集・削除（自分のみ）
   if(own) {
     const editBtn = document.createElement('button'); editBtn.className = 'msg-action-btn'; editBtn.title = '編集';
     editBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
     editBtn.onclick = () => startEdit(msgId, msg.text, type);
     actions.appendChild(editBtn);
+
     const delBtn = document.createElement('button'); delBtn.className = 'msg-action-btn'; delBtn.title = '削除';
     delBtn.style.color = 'var(--red)';
     delBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>';
     delBtn.onclick = () => deleteMessage(msgId, type);
     actions.appendChild(delBtn);
   }
+
   return actions;
 }
 
@@ -1619,6 +1740,117 @@ window.openStampPicker = function(e) {
     });
   }, 0);
 };
+// ===== BOOKMARK =====
+function getBookmarks() {
+  try { return JSON.parse(localStorage.getItem('cs_bookmarks') || '[]'); } catch(e) { return []; }
+}
+function saveBookmarks(bm) { localStorage.setItem('cs_bookmarks', JSON.stringify(bm)); }
+function isMessageBookmarked(msgId) { return getBookmarks().some(b => b.id === msgId); }
+
+function toggleBookmark(msgId, text, authorId) {
+  let bm = getBookmarks();
+  const idx = bm.findIndex(b => b.id === msgId);
+  if(idx >= 0) { bm.splice(idx, 1); showToast('ブックマークを解除しました'); }
+  else { bm.unshift({ id: msgId, text, authorId, roomId: currentRoom, roomType: currentRoomType, ts: Date.now() }); showToast('ブックマークしました'); }
+  saveBookmarks(bm);
+  renderBookmarkList();
+}
+
+let bookmarksOpen = false;
+window.toggleBookmarks = function() {
+  bookmarksOpen = !bookmarksOpen;
+  document.getElementById('bookmark-panel').classList.toggle('show', bookmarksOpen);
+  if(bookmarksOpen) renderBookmarkList();
+};
+
+async function renderBookmarkList() {
+  const list = document.getElementById('bookmark-list');
+  const bm = getBookmarks();
+  list.innerHTML = '';
+  if(bm.length === 0) { list.innerHTML = '<div class="bookmark-empty">ブックマークがありません</div>'; return; }
+  for(const b of bm) {
+    const u = await getUser(b.authorId || '').catch(() => ({ name: '?' }));
+    const div = document.createElement('div'); div.className = 'bookmark-item';
+    div.innerHTML = '<div class="bookmark-item-author">' + escH(u.name || '?') + '</div><div class="bookmark-item-text">' + escH(b.text) + '</div>';
+    div.onclick = () => { if(b.roomId && b.roomId !== currentRoom) openRoom(b.roomId, b.roomType || 'room'); };
+    list.appendChild(div);
+  }
+}
+
+// ===== PROFILE POPUP =====
+window.showProfilePopup = async function(uid, e) {
+  e.stopPropagation();
+  document.querySelectorAll('.profile-popup').forEach(p => p.remove());
+  const u = await getUser(uid);
+  const popup = document.createElement('div'); popup.className = 'profile-popup';
+  const av = document.createElement('div'); av.className = 'profile-popup-avatar';
+  if(u.photoURL) { const img = document.createElement('img'); img.src = u.photoURL; av.appendChild(img); }
+  else { av.style.background = u.color || '#888'; av.textContent = (u.name||'?')[0].toUpperCase(); }
+  popup.appendChild(av);
+  const name = document.createElement('div'); name.className = 'profile-popup-name'; name.textContent = u.name || '?';
+  popup.appendChild(name);
+  const status = document.createElement('div'); status.className = 'profile-popup-status';
+  const dot = document.createElement('div'); dot.className = 'profile-popup-status-dot';
+  dot.style.background = u.online ? 'var(--green)' : 'var(--muted)';
+  const stxt = document.createElement('span'); stxt.style.cssText = 'color:var(--muted);font-size:11px;'; stxt.textContent = u.online ? 'オンライン' : 'オフライン';
+  status.appendChild(dot); status.appendChild(stxt); popup.appendChild(status);
+  if(uid !== currentUser.uid) {
+    const dmBtn = document.createElement('button'); dmBtn.className = 'profile-popup-dm'; dmBtn.textContent = 'DMを送る';
+    dmBtn.onclick = async () => {
+      popup.remove();
+      const members = [currentUser.uid, uid].sort();
+      const dmId = 'dm_' + members.join('_');
+      const existing = await getDoc(doc(db, 'dms', dmId));
+      if(!existing.exists()) {
+        await setDoc(doc(db, 'dms', dmId), { id: dmId, members, createdAt: serverTimestamp() });
+        await addDoc(collection(db, 'dms', dmId, 'messages'), { type: 'system', text: 'DM開始', ts: serverTimestamp(), readBy: [], reactions: {} });
+      }
+      openRoom(dmId, 'dm');
+    };
+    popup.appendChild(dmBtn);
+  }
+  const rect = e.target.closest('.msg-author, .hma, .member-avatar')?.getBoundingClientRect() || e.target.getBoundingClientRect();
+  popup.style.left = Math.min(rect.left, window.innerWidth - 250) + 'px';
+  popup.style.top = (rect.bottom + 8) + 'px';
+  document.body.appendChild(popup);
+  setTimeout(() => document.addEventListener('click', () => popup.remove(), { once: true }), 0);
+};
+
+// ===== ROOM SEARCH =====
+window.openRoomSearch = function() {
+  openModal('room-search-modal');
+  const inp = document.getElementById('room-search-input');
+  inp.value = ''; filterRooms('');
+  setTimeout(() => inp.focus(), 80);
+};
+window.filterRooms = function(q) {
+  const results = document.getElementById('room-search-results'); results.innerHTML = '';
+  const items = document.querySelectorAll('#room-list .room-item');
+  let found = 0;
+  items.forEach(item => {
+    const name = item.querySelector('.room-name')?.textContent || '';
+    if(q === '' || name.toLowerCase().includes(q.toLowerCase())) {
+      const div = document.createElement('div'); div.className = 'room-search-item';
+      div.innerHTML = '<span class="room-search-hash">#</span><span class="room-search-name">' + escH(name) + '</span>';
+      div.onclick = () => { item.click(); closeModal('room-search-modal'); };
+      results.appendChild(div); found++;
+    }
+  });
+  if(found === 0) results.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:13px;">見つかりませんでした</div>';
+};
+document.getElementById('room-search-input').addEventListener('keydown', e => { if(e.key === 'Escape') closeModal('room-search-modal'); });
+
+// ===== SHORTCUTS =====
+document.addEventListener('keydown', e => {
+  if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if((e.ctrlKey || e.metaKey)) {
+    if(e.key === 'k') { e.preventDefault(); window.openRoomSearch(); }
+    if(e.key === 'b') { e.preventDefault(); window.toggleBookmarks(); }
+    if(e.key === 'f') { e.preventDefault(); window.openSearch(); }
+    if(e.key === '/') { e.preventDefault(); openModal('shortcut-modal'); }
+  }
+});
+
 window.openModal = function(id) { document.getElementById(id).classList.add('show'); };
 window.closeModal = function(id) { document.getElementById(id).classList.remove('show'); };
 document.querySelectorAll('.modal-overlay').forEach(el => {
